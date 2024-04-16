@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "aarushi-image-resizing-2"
+version = "0.1.0"
+description = "The task involves developing a feature that processes an uploaded image according to user-defined dimensions, incorporating both resizing and optional aspect ratio maintenance through cropping. To achieve this, we'll leverage Python as the chosen programming language due to its robust support for image manipulation, alongside libraries and techniques previously identified."
+authors = ["AutoGPT <info@agpt.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+pillow = "^9.0.1"
+bcrypt = "^3.2.0"
+fastapi = "^0.78.0"
+passlib = {version = "^1.7.4", extras = ["bcrypt"]}
+prisma = "*"
+pydantic = "*"
+python-jose = {version = "^3.3.0", extras = ["cryptography"]}
+python-multipart = "*"
+uvicorn = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,93 @@
+// datasource db defines the database connection settings.
+// It is configured for PostgreSQL and uses an environment variable for the connection URL.
+// The 'extensions' feature enables the use of PostgreSQL-specific data types.
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+// generator db configures Prisma Client settings.
+// It is set up to use Prisma Client Python with asyncio interface and specific features.
+generator db {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+  previewFeatures      = ["postgresqlExtensions"]
+}
+
+model User {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()"))
+  email                 String                 @unique
+  password              String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  role                  Role                   @default(USER)
+  images                Image[]
+  processingPreferences ProcessingPreference[]
+  sessions              Session[]
+}
+
+model Image {
+  id            String      @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  originalName  String
+  format        ImageFormat
+  status        ImageStatus @default(PENDING)
+  width         Int
+  height        Int
+  desiredWidth  Int?
+  desiredHeight Int?
+  maintainRatio Boolean     @default(false)
+  processedPath String?
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  previews Preview[]
+}
+
+model ProcessingPreference {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  setting   String
+  value     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  userAgent String?
+  ip        String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Preview {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  path      String
+  imageId   String
+  image     Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+  PREMIUM
+}
+
+enum ImageFormat {
+  JPEG
+  PNG
+  WEBP
+}
+
+enum ImageStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
